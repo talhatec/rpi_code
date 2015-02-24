@@ -184,3 +184,71 @@ def main():
 # Start of program
 if __name__ == '__main__':
   main()
+
+
+
+type temporary_type=utf8 record
+   string("\x01") capacity;
+   string("\x01") gic2;
+   string("\x01") counterparty_type;
+   string("\x01") counterparty_class;
+   string("\x01") ubs_ag_business_code;
+   string("\x01") euro_ind_ccnace_code;
+   string("\x01") company_relationship_comprel;
+   string("\x01") new_boe_inst;
+   string("\x01") capital_adequacy_risk_weighting;
+end; /*Temporary variable*/
+
+
+/*
+   --60233662000 GIC2CODE	GIC2
+   --60233660000 COUNTERPARTYTYPE    Counterparty Type
+   --60233672000 CLIENTCLASS    Counterparty Class
+   --60233674000 SBCBUSINESSCODE    UBS AG Business Code
+   --43515370000	NACE Codes	Euro Ind (CCNACE code)
+   --60233666000 COMPREL    Company Relationship
+   --60233664000 BOEINST    New BoE Inst
+   --60233668000 CAPITAL    Capital Adequacy Risk Weighting
+*/
+temp :: rollup(temp, in) =
+begin
+   temp.capacity :: if(!is_null(in.classification_value) and in.classification_value member [vector "AGENT","PRINC","UNDPRIN","AGENTUPR"]) temp.capacity + ',' + in.classification_value else temp.capacity;
+   temp.gic2 :: if(in.classification_type_tid == 60233662000) temp.gic2 + ',' + in.classification_value else temp.gic2;
+   temp.counterparty_type :: if(in.classification_type_tid == 60233660000) temp.counterparty_type + ',' + in.classification_value else temp.counterparty_type;
+   temp.counterparty_class :: if(in.classification_type_tid == 60233672000) temp.counterparty_class + ',' + in.classification_value else temp.counterparty_class;
+   temp.ubs_ag_business_code :: if(in.classification_type_tid == 60233674000) temp.ubs_ag_business_code + ',' + in.classification_value else temp.ubs_ag_business_code;
+   temp.euro_ind_ccnace_code :: if(in.classification_type_tid == 43515370000) temp.euro_ind_ccnace_code + ',' + in.classification_value else temp.euro_ind_ccnace_code;
+   temp.company_relationship_comprel :: if(in.classification_type_tid == 60233666000) temp.company_relationship_comprel + ',' + in.classification_value else temp.company_relationship_comprel;
+   temp.new_boe_inst :: if(in.classification_type_tid == 60233664000) temp.new_boe_inst + ',' + in.classification_value else temp.new_boe_inst;
+   temp.capital_adequacy_risk_weighting :: if(in.classification_type_tid == 60233668000) temp.capital_adequacy_risk_weighting + ',' + in.classification_value else temp.capital_adequacy_risk_weighting;
+end;
+
+temp :: initialize(in) =
+begin
+   temp.capacity :: "";
+   temp.gic2 :: "";
+   temp.counterparty_type :: "";
+   temp.counterparty_class :: "";
+   temp.ubs_ag_business_code :: "";
+   temp.euro_ind_ccnace_code :: "";
+   temp.company_relationship_comprel :: "";
+   temp.new_boe_inst :: "";
+   temp.capital_adequacy_risk_weighting :: "";
+end;
+
+out :: finalize(temp, in) =
+begin
+  out.party_id :: in.party_id;
+  out.capacity :: string_substring( first_defined(temp.capacity,","),2,length_of(first_defined(temp.capacity,",")));
+out.gic2 :: string_substring( first_defined(temp.gic2,","),2,length_of(first_defined(temp.gic2,",")));
+out.counterparty_type :: string_substring( first_defined(temp.counterparty_type,","),2,length_of(first_defined(temp.counterparty_type,",")));
+out.counterparty_class :: string_substring( first_defined(temp.counterparty_class,","),2,length_of(first_defined(temp.counterparty_class,",")));
+out.ubs_ag_business_code :: string_substring( first_defined(temp.ubs_ag_business_code,","),2,length_of(first_defined(temp.ubs_ag_business_code,",")));
+out.euro_ind_ccnace_code :: string_substring( first_defined(temp.euro_ind_ccnace_code,","),2,length_of(first_defined(temp.euro_ind_ccnace_code,",")));
+out.company_relationship_comprel :: string_substring( first_defined(temp.company_relationship_comprel,","),2,length_of(first_defined(temp.company_relationship_comprel,",")));
+out.new_boe_inst :: string_substring( first_defined(temp.new_boe_inst,","),2,length_of(first_defined(temp.new_boe_inst,",")));
+out.capital_adequacy_risk_weighting :: string_substring( first_defined(temp.capital_adequacy_risk_weighting,","),2,length_of(first_defined(temp.capital_adequacy_risk_weighting,",")));
+end;
+
+
+
