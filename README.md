@@ -200,16 +200,11 @@ type temporary_type=utf8 record
 end; /*Temporary variable*/
 
 
-/*
-   --60233662000 GIC2CODE	GIC2
-   --60233660000 COUNTERPARTYTYPE    Counterparty Type
-   --60233672000 CLIENTCLASS    Counterparty Class
-   --60233674000 SBCBUSINESSCODE    UBS AG Business Code
-   --43515370000	NACE Codes	Euro Ind (CCNACE code)
-   --60233666000 COMPREL    Company Relationship
-   --60233664000 BOEINST    New BoE Inst
-   --60233668000 CAPITAL    Capital Adequacy Risk Weighting
-*/
+
+
+
+// Rollup
+
 temp :: rollup(temp, in) =
 begin
    temp.capacity :: if(!is_null(in.classification_value) and in.classification_value member [vector "AGENT","PRINC","UNDPRIN","AGENTUPR"]) temp.capacity + ',' + in.classification_value else temp.capacity;
